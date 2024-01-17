@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CSharpFunctionalExtensions;
+using Microsoft.AspNetCore.Mvc;
 using SendingMessagesService.Dtos;
+using SendingMessagesService.Logic;
+using System.ComponentModel.DataAnnotations;
 
 namespace SendingMessagesService.Controllers
 {
@@ -7,18 +10,25 @@ namespace SendingMessagesService.Controllers
     [ApiController]
     public class MessagesController : ControllerBase
     {
-        [Route("/")]
         [HttpPost]
-        public void SendMessages([FromBody] IEnumerable<SendMessageDto> dtos)
+        public IActionResult SendMessages([Required, FromBody] IEnumerable<SendMessageDto> dtos)
         {
+            Result validateResult = Result.Success();
+            foreach (SendMessageDto dto in dtos)
+            {
+                Result<Message> messageResult = Message.Create(dto.Subject, dto.Body, dto.Recipients);
+                validateResult = Result.Combine(validateResult, messageResult);
+            }
+            if (validateResult.IsFailure)
+                return BadRequest(validateResult.Error);
 
+            return Ok();
         }
 
-        [Route("/")]
         [HttpGet]
-        public void GetMessages()
+        public IActionResult GetMessages()
         {
-
+            return Ok();
         }
     }
 }

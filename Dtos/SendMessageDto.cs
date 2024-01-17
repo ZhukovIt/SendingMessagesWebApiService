@@ -1,7 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using SendingMessagesService.Attributes;
+using System.ComponentModel.DataAnnotations;
 
 namespace SendingMessagesService.Dtos
 {
+    [Message]
     public sealed class SendMessageDto
     {
         [Required]
