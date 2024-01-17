@@ -26,21 +26,36 @@ namespace SendingMessagesService.Controllers
             if (dtos.Count() == 0)
                 return Error("Отсутствуют сообщения для отправки!");
 
-            List<Message> messages = new List<Message>();
             foreach (SendMessageDto dto in dtos)
             {
-                messages.Add(Message.Create(dto.Subject, dto.Body, dto.Recipients).Value);
+                Subject subject = Subject.Create(dto.Subject).Value;
+                Body body = Body.Create(dto.Body).Value;
+                Recipients recipients = Recipients.Create(dto.Recipients).Value;
+                Message message = new Message(subject, body, recipients);
+                _messagesQueue.Add(message);
             }
 
-
-
-            return StatusCode(201);
+            return Created();
         }
 
         [HttpGet]
-        public IActionResult GetMessages()
+        public IActionResult GetMessages([FromQuery] int rcpt)
         {
-            return Ok();
+            if (rcpt == 0)
+                return Error($"Для попытки получения сообщений необходимо указать параметр {nameof(rcpt)}!");
+
+            Maybe<IReadOnlyList<Message>> messagesOrNone = _messagesQueue.Get(rcpt);
+            if (messagesOrNone.HasNoValue)
+                return NotFound($"Для получателя с {nameof(rcpt)} = {rcpt} нет сообщений!");
+
+            List<GetMessageDto> dtos = messagesOrNone.Value.Select(msg => new GetMessageDto()
+            {
+                Subject = msg.Subject,
+                Body = msg.Body
+            })
+            .ToList();
+
+            return Ok(dtos);
         }
     }
 }

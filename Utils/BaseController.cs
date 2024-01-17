@@ -16,7 +16,17 @@ namespace SendingMessagesService.Utils
 
         protected IActionResult Error(string errorMessage)
         {
-            return BadRequest(Envelope.Error(errorMessage));
+            return base.BadRequest(Envelope.Error(errorMessage));
+        }
+
+        protected IActionResult NotFound(string errorMessage)
+        {
+            return base.NotFound(Envelope.Error(errorMessage));
+        }
+
+        protected IActionResult Created()
+        {
+            return base.StatusCode(201);
         }
     }
 }

@@ -3,16 +3,15 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SendingMessagesService.Dtos
 {
-    [Message]
     public sealed class SendMessageDto
     {
-        [Required]
+        [Required, Subject]
         public string Subject { get; set; }
 
-        [Required]
+        [Required, Body]
         public string Body { get; set; }
 
-        [Required]
+        [Required, Recipients]
         public IReadOnlyList<int> Recipients { get; set; }
     }
 }

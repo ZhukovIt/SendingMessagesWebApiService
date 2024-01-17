@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using SendingMessagesService.Logic;
+﻿using SendingMessagesService.Logic;
 using SendingMessagesService.Utils;
 
 namespace SendingMessagesService

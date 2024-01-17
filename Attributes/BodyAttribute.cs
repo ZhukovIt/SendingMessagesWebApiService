@@ -6,21 +6,21 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SendingMessagesService.Attributes
 {
-    [AttributeUsage(AttributeTargets.Class)]
-    public class MessageAttribute : ValidationAttribute
+    [AttributeUsage(AttributeTargets.Property)]
+    public class BodyAttribute : ValidationAttribute
     {
         protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
             if (value == null)
                 return ValidationResult.Success;
 
-            if (value is not SendMessageDto dto)
+            if (value is not string body)
                 return new ValidationResult(Errors.Errors.General.ValueIsInvalidType(value).Serialize());
 
-            Result<Message> messageResult = Message.Create(dto.Subject, dto.Body, dto.Recipients);
+            Result<Body> bodyResult = Body.Create(body);
 
-            if (messageResult.IsFailure)
-                return new ValidationResult(messageResult.Error.Serialize());
+            if (bodyResult.IsFailure)
+                return new ValidationResult(bodyResult.Error.Serialize());
 
             return ValidationResult.Success;
         }

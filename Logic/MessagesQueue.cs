@@ -1,25 +1,26 @@
 ﻿using CSharpFunctionalExtensions;
+using SendingMessagesService.Dtos;
 
 namespace SendingMessagesService.Logic
 {
     public sealed class MessagesQueue
     {
-        private readonly Dictionary<int, List<Message>> _queue = new Dictionary<int, List<Message>>();
+        private readonly List<Message> _queue = new List<Message>();
 
-        public void Add(int key, Message message)
+        public void Add(Message message)
         {
-            if (!_queue.ContainsKey(key))
-                _queue[key] = new List<Message>();
-
-            _queue[key].Add(message);
+            _queue.Add(message);
         }
 
         public Maybe<IReadOnlyList<Message>> Get(int key)
         {
-            if (!_queue.ContainsKey(key))
-                return Maybe.None;
+            List<Message> messages = _queue
+                .Where(msg => msg.Recipients.Value.Contains(key))
+                .ToList();
 
-            return _queue[key];
+            if (messages.Count == 0)
+                return Maybe.None;
+            return messages;
         }
     }
 }

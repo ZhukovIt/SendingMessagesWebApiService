@@ -31,15 +31,16 @@ namespace SendingMessagesService.Errors
             return $"{Code}{_separator}{Message}";
         }
 
-        public static Error Deserialize(string serialized)
+        public static Result<Error> TryDeserialize(string serialized)
         {
             string[] data = serialized.Split(
                 new[] { _separator },
                 StringSplitOptions.RemoveEmptyEntries);
 
-            Guard.Require(data.Length >= 2, $"Invalid error serialization: \"{serialized}\"");
+            if (data.Length < 2)
+                return Result.Failure<Error>($"Invalid error serialization: \"{serialized}\"");
 
-            return new Error(data[0], data[1]);
+            return Result.Success(new Error(data[0], data[1]));
         }
     }
 }
