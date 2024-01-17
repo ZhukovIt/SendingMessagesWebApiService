@@ -1,6 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using SendingMessagesService.Dtos;
 using SendingMessagesService.Logic;
+using SendingMessagesService.Errors;
 using System.ComponentModel.DataAnnotations;
 
 namespace SendingMessagesService.Attributes
@@ -19,7 +20,7 @@ namespace SendingMessagesService.Attributes
             Result<Message> messageResult = Message.Create(dto.Subject, dto.Body, dto.Recipients);
 
             if (messageResult.IsFailure)
-                return new ValidationResult(messageResult.Error);
+                return new ValidationResult(messageResult.Error.Serialize());
 
             return ValidationResult.Success;
         }

@@ -1,28 +1,40 @@
 ﻿using CSharpFunctionalExtensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SendingMessagesService.Dtos;
+using SendingMessagesService.Errors;
 using SendingMessagesService.Logic;
+using SendingMessagesService.Utils;
 using System.ComponentModel.DataAnnotations;
 
 namespace SendingMessagesService.Controllers
 {
     [Route("api/v1/[controller]")]
     [ApiController]
-    public class MessagesController : ControllerBase
+    public class MessagesController : BaseController
     {
-        [HttpPost]
-        public IActionResult SendMessages([Required, FromBody] IEnumerable<SendMessageDto> dtos)
+        private readonly MessagesQueue _messagesQueue;
+
+        public MessagesController(MessagesQueue messagesQueue) : base()
         {
-            Result validateResult = Result.Success();
+            _messagesQueue = messagesQueue;
+        }
+
+        [HttpPost]
+        public IActionResult SendMessages([FromBody] IEnumerable<SendMessageDto> dtos)
+        {
+            if (dtos.Count() == 0)
+                return Error("Отсутствуют сообщения для отправки!");
+
+            List<Message> messages = new List<Message>();
             foreach (SendMessageDto dto in dtos)
             {
-                Result<Message> messageResult = Message.Create(dto.Subject, dto.Body, dto.Recipients);
-                validateResult = Result.Combine(validateResult, messageResult);
+                messages.Add(Message.Create(dto.Subject, dto.Body, dto.Recipients).Value);
             }
-            if (validateResult.IsFailure)
-                return BadRequest(validateResult.Error);
 
-            return Ok();
+
+
+            return StatusCode(201);
         }
 
         [HttpGet]
