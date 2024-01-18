@@ -21,12 +21,12 @@ namespace SendingMessagesService.Controllers
         }
 
         [HttpPost]
-        public IActionResult SendMessages([FromBody] IEnumerable<SendMessageDto> dtos)
+        public IActionResult SendMessages([FromBody] SendMessageDto[] messageDtos)
         {
-            if (dtos.Count() == 0)
+            if (messageDtos.Count() == 0)
                 return Error("Отсутствуют сообщения для отправки!");
 
-            foreach (SendMessageDto dto in dtos)
+            foreach (SendMessageDto dto in messageDtos)
             {
                 Subject subject = Subject.Create(dto.Subject).Value;
                 Body body = Body.Create(dto.Body).Value;
